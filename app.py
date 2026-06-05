@@ -6,6 +6,7 @@ from playlist_logic import (
     build_playlists,
     compute_playlist_stats,
     history_summary,
+    is_duplicate_song,
     lucky_pick,
     merge_playlists,
     normalize_song,
@@ -250,9 +251,18 @@ def add_song_sidebar():
         }
         if title and artist:
             normalized = normalize_song(song)
-            all_songs = st.session_state.songs[:]
-            all_songs.append(normalized)
-            st.session_state.songs = all_songs
+            if is_duplicate_song(st.session_state.songs, normalized):
+                st.sidebar.warning(
+                    f"'{normalized['title']}' by {normalized['artist']} "
+                    "is already in your playlist."
+                )
+            else:
+                all_songs = st.session_state.songs[:]
+                all_songs.append(normalized)
+                st.session_state.songs = all_songs
+                st.sidebar.success(f"Added '{normalized['title']}'.")
+        else:
+            st.sidebar.error("Please enter both a title and an artist.")
 
 
 def playlist_tabs(playlists):

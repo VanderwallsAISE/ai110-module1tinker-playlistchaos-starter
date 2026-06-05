@@ -57,6 +57,23 @@ def normalize_song(raw: Song) -> Song:
     }
 
 
+def is_duplicate_song(songs: List[Song], candidate: Song) -> bool:
+    """Return True if a song with the same title and artist already exists.
+
+    Title comparison is case-insensitive (for detection only), and artist
+    comparison reuses normalize_artist, which already lowercases and trims.
+    """
+    cand_title = normalize_title(str(candidate.get("title", ""))).lower()
+    cand_artist = normalize_artist(str(candidate.get("artist", "")))
+
+    for song in songs:
+        existing_title = normalize_title(str(song.get("title", ""))).lower()
+        existing_artist = normalize_artist(str(song.get("artist", "")))
+        if existing_title == cand_title and existing_artist == cand_artist:
+            return True
+    return False
+
+
 def classify_song(song: Song, profile: Dict[str, object]) -> str:
     """Return a mood label given a song and user profile."""
     energy = song.get("energy", 0)
